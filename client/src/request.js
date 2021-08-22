@@ -84,3 +84,26 @@ export const loadCompany = async (companyId) => {
   const { company } = await fetchGraphql(query, variables);
   return company;
 };
+
+export const addJob = async (input) => {
+  const mutation = ` 
+    mutation CreateJob($input: CreateJobInput ){ 
+      job: createJob(input: $input){
+        id
+        description
+        title
+        company {
+          name
+          id
+        }
+      }
+    }
+    
+  `;
+  const variables = {
+    input
+  };
+
+  const { job } = await fetchGraphql(mutation, variables);
+  return job;
+};
