@@ -21,7 +21,11 @@ app.use(
   })
 );
 
-const apolloServer = new ApolloServer({ typeDefs, resolvers });
+const context = ({ req }) => ({
+  user: db.users.get(req.user?.sub)
+});
+
+const apolloServer = new ApolloServer({ typeDefs, resolvers, context });
 await apolloServer.start();
 apolloServer.applyMiddleware({ app, path: '/graphql' });
 

@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
+
+import { addJob } from './request';
 
 export default function JobForm() {
   const [formDetail, setFormDetail] = useState({ title: '', description: '' });
+  const history = useHistory();
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -10,7 +14,11 @@ export default function JobForm() {
 
   const handleClick = (event) => {
     event.preventDefault();
-    console.log('should post a new job:', formDetail);
+    if (formDetail.input === '' && formDetail.description === '') return;
+    const input = { ...formDetail };
+    addJob(input).then((data) => {
+      history.push(`/jobs/${data.id}`);
+    });
   };
 
   const { title, description } = formDetail;

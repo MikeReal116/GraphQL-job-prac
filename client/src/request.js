@@ -1,11 +1,18 @@
+import { getAccessToken, isLoggedIn } from './auth';
+
 const url = 'http://localhost:9000/graphql';
 
 const fetchGraphql = async (query, variables = {}) => {
+  const headers = {
+    'content-type': 'application/json'
+  };
+  if (isLoggedIn) {
+    headers['authorization'] = `Bearer ${getAccessToken()}`;
+  }
+
   const response = await fetch(url, {
     method: 'POST',
-    headers: {
-      'content-type': 'application/json'
-    },
+    headers,
     body: JSON.stringify({
       query,
       variables

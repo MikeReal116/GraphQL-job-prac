@@ -16,5 +16,29 @@
     "companyId": "SJV0-wdOM",
     "title": "Full-Stack Developer",
     "description": "We are looking for a Full-Stack Developer familiar with Node.js, Express, and React."
+  },
+  {
+    "id": "B1Vz8fxZK",
+    "title": "Data Scientist",
+    "description": "We are looking for motivated people who want to start a career in data science",
+    "companyId": "HJRa-DOuG"
+  },
+  {
+    "id": "BJuNzXx-Y",
+    "title": "Data Scientist",
+    "description": "We are looking for motivated people who want to start a career in data science",
+    "companyId": "HJRa-DOuG"
+  },
+  {
+    "id": "ry5Vv7gZK",
+    "title": "UX Designer",
+    "description": "We are looking for motivated people who are familiar with Figma ",
+    "companyId": "SJV0-wdOM"
+  },
+  {
+    "id": "B10Y3NlbF",
+    "title": "Scrum Master",
+    "description": "Lead development projects for our developers",
+    "companyId": "HJRa-DOuG"
   }
 ]

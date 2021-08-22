@@ -6,6 +6,18 @@ export const resolvers = {
     job: (root, { id }) => db.jobs.get(id),
     company: (root, { id }) => db.companies.get(id)
   },
+  Mutation: {
+    createJob: (root, { input }, context) => {
+      if (!context.user) {
+        throw new Error('Unauthorized');
+      }
+      const id = db.jobs.create({
+        ...input,
+        companyId: context.user.companyId
+      });
+      return db.jobs.get(id);
+    }
+  },
   Job: {
     company: (job) => db.companies.get(job.companyId)
   },

@@ -6,6 +6,9 @@ export const typeDefs = gql`
     job(id: ID!): Job
     company(id: ID!): Company
   }
+  type Mutation {
+    createJob(input: CreateJobInput): Job
+  }
   type Job {
     id: ID!
     title: String
@@ -17,5 +20,10 @@ export const typeDefs = gql`
     name: String
     description: String
     jobs: [Job]
+  }
+
+  input CreateJobInput {
+    title: String
+    description: String
   }
 `;
