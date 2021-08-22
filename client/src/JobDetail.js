@@ -1,11 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { jobs } from './fake-data';
+
+import { loadJob } from './request';
 
 export default function JobDetail() {
   const { jobId } = useParams();
-  const jobDt = jobs.find((job) => job.id === jobId);
-  const [job, setJob] = useState(jobDt);
+  const [job, setJob] = useState(null);
+
+  useEffect(() => {
+    loadJob(jobId).then((data) => setJob(data));
+  }, [jobId]);
+
+  if (!job) {
+    return null;
+  }
 
   return (
     <div>
