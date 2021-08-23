@@ -1,103 +1,49 @@
+import {
+  ApolloClient,
+  ApolloLink,
+  HttpLink,
+  InMemoryCache
+} from 'apollo-boost';
+import gql from 'graphql-tag';
+
 import { getAccessToken, isLoggedIn } from './auth';
 
 const url = 'http://localhost:9000/graphql';
 
-const fetchGraphql = async (query, variables = {}) => {
-  const headers = {
-    'content-type': 'application/json'
-  };
+const authLink = new ApolloLink((operation, forward) => {
   if (isLoggedIn) {
-    headers['authorization'] = `Bearer ${getAccessToken()}`;
+    operation.setContext({
+      headers: {
+        authorization: `Bearer ${getAccessToken()}`
+      }
+    });
   }
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      query,
-      variables
-    })
-  });
+  return forward(operation);
+});
 
-  const responseBody = await response.json();
-  if (responseBody.errors) {
-    const errMsg = responseBody.errors.map((error) => error.message).join('\n');
-    throw new Error(errMsg);
+const client = new ApolloClient({
+  link: ApolloLink.from([authLink, new HttpLink({ uri: url })]),
+  cache: new InMemoryCache()
+});
+
+const jobDetailFragment = gql`
+  fragment JobDetail on Job {
+    id
+    description
+    title
+    company {
+      name
+      id
+    }
   }
-  return responseBody.data;
-};
+`;
 
 export const loadJobs = async () => {
-  const query = ` 
-      query JobPosts {
-        jobs {
-          id
-          title
-          company {
-            name
-            id
-          }
-        }
-      }
-            `;
-
-  const { jobs } = await fetchGraphql(query);
-  return jobs;
-};
-
-export const loadJob = async (jobId) => {
-  const query = `
-                query JobPost($id: ID!){
-                    job(id: $id) {
-                        id
-                        title
-                        description
-                        company {
-                            id
-                            name
-                        }  
-                    }
-                }
-            `;
-  const variables = {
-    id: jobId
-  };
-
-  const { job } = await fetchGraphql(query, variables);
-  return job;
-};
-
-export const loadCompany = async (companyId) => {
-  const query = `
-      query Company ($id: ID!){
-          company(id: $id) {
-              id
-              name
-              description
-              jobs {
-                  id
-                  title
-                  company {
-                      name
-                  }
-              }
-          }
-      }
-    `;
-  const variables = {
-    id: companyId
-  };
-
-  const { company } = await fetchGraphql(query, variables);
-  return company;
-};
-
-export const addJob = async (input) => {
-  const mutation = ` 
-    mutation CreateJob($input: CreateJobInput ){ 
-      job: createJob(input: $input){
+  const query = gql`
+    query JobPosts {
+      jobs {
         id
-        description
         title
         company {
           name
@@ -105,12 +51,73 @@ export const addJob = async (input) => {
         }
       }
     }
-    
+  `;
+
+  const {
+    data: { jobs }
+  } = await client.query({ query, fetchPolicy: 'no-cache' });
+  return jobs;
+};
+
+export const loadJob = async (jobId) => {
+  const query = gql`
+    query JobPost($id: ID!) {
+      job(id: $id) {
+        ...JobDetail
+      }
+    }
+    ${jobDetailFragment}
+  `;
+  const variables = {
+    id: jobId
+  };
+
+  const {
+    data: { job }
+  } = await client.query({ query, variables });
+  return job;
+};
+
+export const loadCompany = async (companyId) => {
+  const query = gql`
+    query Company($id: ID!) {
+      company(id: $id) {
+        id
+        name
+        description
+        jobs {
+          id
+          title
+          company {
+            name
+          }
+        }
+      }
+    }
+  `;
+  const variables = {
+    id: companyId
+  };
+
+  const {
+    data: { company }
+  } = await client.query({ query, variables });
+  return company;
+};
+
+export const addJob = async (input) => {
+  const mutation = gql`
+    mutation CreateJob($input: CreateJobInput) {
+      job: createJob(input: $input) {
+        ...JobDetail
+      }
+    }
+    ${jobDetailFragment}
   `;
   const variables = {
     input
   };
 
-  const { job } = await fetchGraphql(mutation, variables);
+  const { data: job } = await client.mutate({ mutation, variables });
   return job;
 };

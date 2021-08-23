@@ -40,5 +40,11 @@
     "title": "Scrum Master",
     "description": "Lead development projects for our developers",
     "companyId": "HJRa-DOuG"
+  },
+  {
+    "id": "SkFaDSZ-K",
+    "title": "React Dev",
+    "description": "We are looking for motivated people to help us build our User Interface",
+    "companyId": "HJRa-DOuG"
   }
 ]
